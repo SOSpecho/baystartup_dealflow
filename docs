@@ -37,7 +37,7 @@
             if (response.ok && result.records.length > 0) {
                 const zugelassen = result.records[0].fields['Zugelassen'];
                 if (zugelassen) {
-                    window.location.href = 'SHARED_VIEW_LINK';
+                    window.location.href = 'https://airtable.com/appct2Lt9xy1MSXkL/shrHJuWfSCQvkL9JD';
                 } else {
                     error.style.display = 'block';
                 }
