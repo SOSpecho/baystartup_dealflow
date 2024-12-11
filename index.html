@@ -21,27 +21,40 @@
             const error = document.getElementById('error');
             error.style.display = 'none';
 
-            const response = await fetch('https://api.airtable.com/v0/YOUR_BASE_ID/Investoren', {
-                method: 'POST',
-                headers: {
-                    'Authorization': 'Bearer YOUR_API_KEY',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    "fields": { "E-Mail-Adresse": email }
-                })
-            });
+            // Airtable API-Infos
+            const airtableBaseId = 'appct2Lt9xy1MSXkL'; // Ersetze mit der tatsächlichen Base ID
+            const airtableTableId = 'tblPwX6DFYvtRlRYy'; // ID für die Tabelle 'Investoren'
+            const airtableApiKey = 'patK4Pl3PNQy9GH7n.d92a646f2f59f284dc0c3a251fb5b91b9039d2026e6b1db26acad539d08731bf'; // Ersetze mit deinem API-Schlüssel
+            const airtableApiUrl = `https://api.airtable.com/v0/${airtableBaseId}/${airtableTableId}`;
 
-            const result = await response.json();
+            try {
+                // Anfrage an Airtable senden
+                const response = await fetch(`${airtableApiUrl}?filterByFormula=E-Mail-Adresse="${email}"`, {
+                    headers: {
+                        'Authorization': `Bearer ${airtableApiKey}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
 
-            if (response.ok && result.records.length > 0) {
-                const zugelassen = result.records[0].fields['Zugelassen'];
-                if (zugelassen) {
-                    window.location.href = 'https://airtable.com/appct2Lt9xy1MSXkL/shrHJuWfSCQvkL9JD';
+                const result = await response.json();
+
+                if (response.ok && result.records.length > 0) {
+                    // Überprüfen, ob der Nutzer zugelassen ist
+                    const zugelassen = result.records[0].fields['Zugelassen'];
+                    if (zugelassen) {
+                        // Weiterleitung zur Airtable-Ansicht
+                        window.location.href = 'https://airtable.com/appct2Lt9xy1MSXkL/shrHJuWfSCQvkL9JD';
+                    } else {
+                        error.textContent = "Kein Zugriff für diese E-Mail-Adresse.";
+                        error.style.display = 'block';
+                    }
                 } else {
+                    error.textContent = "E-Mail-Adresse nicht gefunden oder kein Zugriff.";
                     error.style.display = 'block';
                 }
-            } else {
+            } catch (err) {
+                console.error(err);
+                error.textContent = "Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.";
                 error.style.display = 'block';
             }
         });
